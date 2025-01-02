@@ -4,14 +4,6 @@
  */
 const form = document.getElementById("uv-form");
 /**
- * @type {HTMLInputElement}
- */
-const address = document.getElementById("uv-address");
-/**
- * @type {HTMLInputElement}
- */
-const searchEngine = document.getElementById("uv-search-engine");
-/**
  * @type {HTMLParagraphElement}
  */
 const error = document.getElementById("uv-error");
@@ -21,8 +13,8 @@ const error = document.getElementById("uv-error");
 const errorCode = document.getElementById("uv-error-code");
 const connection = new BareMux.BareMuxConnection("/baremux/worker.js")
 
-form.addEventListener("submit", async (event) => {
-	event.preventDefault();
+async function main(url){
+
 
 	try {
 		await registerSW();
@@ -32,8 +24,6 @@ form.addEventListener("submit", async (event) => {
 		throw err;
 	}
 
-	const url = search(address.value, searchEngine.value);
-
 	let frame = document.getElementById("uv-frame");
 	frame.style.display = "block";
 	let wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
@@ -41,4 +31,9 @@ form.addEventListener("submit", async (event) => {
 		await connection.setTransport("/epoxy/index.mjs", [{ wisp: wispUrl }]);
 	}
 	frame.src = __uv$config.prefix + __uv$config.encodeUrl(url);
-});
+}
+(()=>{
+	let params = new URLSearchParams(location.search);
+	let url = params.get("url");
+	main(url);
+})();
